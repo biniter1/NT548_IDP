@@ -30,7 +30,8 @@ module "security" {
   vpc_id = module.vpc.vpc_id
 }
 module "ecr" {
-  source = "../../modules/ecr"
+  source               = "../../modules/ecr"
+  image_tag_mutability = "IMMUTABLE"
 }
 module "eks_cluster" {
   source = "../../modules/compute/eks_cluster"

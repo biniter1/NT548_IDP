@@ -55,8 +55,12 @@ resource "aws_iam_role_policy_attachment" "registry_policy" {
 
 
 resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
+
+  # Official GitHub Actions OIDC thumbprint (SHA-1 of GitHub's TLS cert root CA).
+  # Ref: https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+  # Update this value if GitHub rotates their certificate.
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
@@ -110,10 +114,11 @@ resource "aws_iam_role_policy" "github_actions_policy" {
         Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/online-boutique/*"
       },
       {
-        Sid      = "EKSAccess"
-        Effect   = "Allow"
-        Action   = ["eks:DescribeCluster", "eks:ListClusters"]
-        Resource = "*"
+        Sid    = "EKSAccess"
+        Effect = "Allow"
+        Action = ["eks:DescribeCluster", "eks:ListClusters"]
+        # Scoped to the specific cluster created by this project
+        Resource = "arn:aws:eks:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.name_project}-cluster"
       }
     ]
   })

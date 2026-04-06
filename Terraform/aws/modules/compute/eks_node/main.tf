@@ -16,9 +16,9 @@ resource "aws_eks_node_group" "workers" {
   }
 
   # Use latest EKS optimized AMI
-  ami_type       = "AL2_x86_64"
-  capacity_type  = "ON_DEMAND"
-  disk_size      = 20
+  ami_type      = "AL2_x86_64"
+  capacity_type = var.capacity_type
+  disk_size     = var.disk_size
 
   tags = {
     Name        = "${var.eks_cluster_name}-workers"

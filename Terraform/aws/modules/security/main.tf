@@ -127,6 +127,27 @@ resource "aws_security_group_rule" "nodes_egress_https" {
   security_group_id = aws_security_group.eks_node_sg.id
 }
 
+# Egress → DNS (UDP 53) for external name resolution
+resource "aws_security_group_rule" "nodes_egress_dns_udp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Nodes DNS egress UDP (external resolution)"
+  security_group_id = aws_security_group.eks_node_sg.id
+}
+
+resource "aws_security_group_rule" "nodes_egress_dns_tcp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Nodes DNS egress TCP (large DNS responses)"
+  security_group_id = aws_security_group.eks_node_sg.id
+}
+
 # ──────────────────────────────────────────
 # 4. Database Rules
 # ──────────────────────────────────────────

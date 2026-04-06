@@ -46,3 +46,20 @@ variable "max_size" {
   description = "Maximum number of worker nodes"
   default     = 4
 }
+
+variable "disk_size" {
+  type        = number
+  description = "EBS volume size in GB for each worker node"
+  default     = 50
+}
+
+variable "capacity_type" {
+  type        = string
+  description = "Capacity type for worker nodes: ON_DEMAND or SPOT"
+  default     = "ON_DEMAND"
+
+  validation {
+    condition     = contains(["ON_DEMAND", "SPOT"], var.capacity_type)
+    error_message = "capacity_type must be ON_DEMAND or SPOT."
+  }
+}

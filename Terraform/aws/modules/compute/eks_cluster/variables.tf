@@ -28,3 +28,9 @@ variable "eks_node_sg_id" {
   type        = string
   description = "Security Group ID for EKS nodes"
 }
+
+variable "endpoint_public_access" {
+  type        = bool
+  description = "Enable public Kubernetes API endpoint. Set true only if external kubectl access is needed."
+  default     = false
+}
