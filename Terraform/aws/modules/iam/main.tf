@@ -28,6 +28,9 @@ data "aws_iam_policy_document" "eks_node_assume_role" {
     }
   }
 }
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 resource "aws_iam_role" "eks_node_role" {
   name = "eks-node-role"
 
@@ -50,7 +53,7 @@ resource "aws_iam_role_policy_attachment" "registry_policy" {
 
 # Thêm vào modules/iam/main.tf
 
-# OIDC Provider để GitHub Actions xác thực với AWS
+
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
@@ -71,7 +74,7 @@ resource "aws_iam_role" "github_actions" {
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:biniter1/DACN:*"
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:*"
         }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
@@ -104,7 +107,7 @@ resource "aws_iam_role_policy" "github_actions_policy" {
           "ecr:UploadLayerPart", "ecr:CreateRepository",
           "ecr:DescribeRepositories", "ecr:ListImages"
         ]
-        Resource = "arn:aws:ecr:ap-southeast-2:*:repository/online-boutique/*"
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/online-boutique/*"
       },
       {
         Sid      = "EKSAccess"

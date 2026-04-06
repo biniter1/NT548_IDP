@@ -1,4 +1,4 @@
-# modules/ecr/main.tf — CẦN TẠO MỚI
+
 locals {
   services = [
     "frontend", "cartservice", "productcatalogservice",
