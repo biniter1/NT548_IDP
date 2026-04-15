@@ -115,4 +115,37 @@ kubectl wait --for=condition=ready pod \
 # Xem tất cả resources
 kubectl get all -n boutique
 
+# Truy cập frontend
+kubectl port-forward svc/frontend 8080:80 -n boutique
+```
+Tạo Ingress cho frontend
+k8s/ingress-frontend.yaml
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  namespace: boutique
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+```
+```bash
+kubectl apply -f k8s/ingress-frontend.yaml
+
+# Test — truy cập thẳng localhost:80
+curl -I http://localhost
+# HTTP/1.1 200 OK ← thành công
+
 ```

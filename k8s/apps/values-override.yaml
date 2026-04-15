@@ -1,6 +1,3 @@
-images:
-  repository: ghcr.io/biniter1
-
 loadGenerator:
   create: false
 

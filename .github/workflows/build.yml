@@ -1,85 +1,85 @@
-name: build temp
+# name: build temp
 
-on:
-  push:
-    branches: [main]
+# on:
+#   push:
+#     branches: [main]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+#     permissions:
+#       contents: read
+#       packages: write
 
-    strategy:
-      matrix:
-        include:
-          - name: frontend
-            context: ./src/frontend
-            dockerfile: ./src/frontend/Dockerfile
+#     strategy:
+#       matrix:
+#         include:
+#           - name: frontend
+#             context: ./src/frontend
+#             dockerfile: ./src/frontend/Dockerfile
 
-          - name: cartservice
-            context: ./src/cartservice
-            dockerfile: ./src/cartservice/src/Dockerfile
+#           - name: cartservice
+#             context: ./src/cartservice
+#             dockerfile: ./src/cartservice/src/Dockerfile
 
-          - name: checkoutservice
-            context: ./src/checkoutservice
-            dockerfile: ./src/checkoutservice/Dockerfile
+#           - name: checkoutservice
+#             context: ./src/checkoutservice
+#             dockerfile: ./src/checkoutservice/Dockerfile
 
           
-          - name: shoppingassistantservice
-            context: ./src/shoppingassistantservice
-            dockerfile: ./src/shoppingassistantservice/Dockerfile
+#           - name: shoppingassistantservice
+#             context: ./src/shoppingassistantservice
+#             dockerfile: ./src/shoppingassistantservice/Dockerfile
           
-          - name: productcatalogservice
-            context: ./src/productcatalogservice
-            dockerfile: ./src/productcatalogservice/Dockerfile
+#           - name: productcatalogservice
+#             context: ./src/productcatalogservice
+#             dockerfile: ./src/productcatalogservice/Dockerfile
           
-          - name: currencyservice
-            context: ./src/currencyservice
-            dockerfile: ./src/currencyservice/Dockerfile
+#           - name: currencyservice
+#             context: ./src/currencyservice
+#             dockerfile: ./src/currencyservice/Dockerfile
           
-          - name: paymentservice
-            context: ./src/paymentservice
-            dockerfile: ./src/paymentservice/Dockerfile
+#           - name: paymentservice
+#             context: ./src/paymentservice
+#             dockerfile: ./src/paymentservice/Dockerfile
           
-          - name: emailservice
-            context: ./src/emailservice
-            dockerfile: ./src/emailservice/Dockerfile
+#           - name: emailservice
+#             context: ./src/emailservice
+#             dockerfile: ./src/emailservice/Dockerfile
           
-          - name: shippingservice
-            context: ./src/shippingservice
-            dockerfile: ./src/shippingservice/Dockerfile
+#           - name: shippingservice
+#             context: ./src/shippingservice
+#             dockerfile: ./src/shippingservice/Dockerfile
           
-          - name: recommendationservice
-            context: ./src/recommendationservice
-            dockerfile: ./src/recommendationservice/Dockerfile
+#           - name: recommendationservice
+#             context: ./src/recommendationservice
+#             dockerfile: ./src/recommendationservice/Dockerfile
 
-          - name: adservice
-            context: ./src/adservice
-            dockerfile: ./src/adservice/Dockerfile
+#           - name: adservice
+#             context: ./src/adservice
+#             dockerfile: ./src/adservice/Dockerfile
 
-          - name: loadgenerator
-            context: ./src/loadgenerator
-            dockerfile: ./src/loadgenerator/Dockerfile
+#           - name: loadgenerator
+#             context: ./src/loadgenerator
+#             dockerfile: ./src/loadgenerator/Dockerfile
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Login to GHCR
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ghcr.io
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & Push ${{ matrix.name }}
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: |
-            ghcr.io/nt548_idp/${{ matrix.name }}:latest
+#       - name: Build & Push ${{ matrix.name }}
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: ${{ matrix.context }}
+#           file: ${{ matrix.dockerfile }}
+#           push: true
+#           tags: |
+#             ghcr.io/nt548_idp/${{ matrix.name }}:latest
