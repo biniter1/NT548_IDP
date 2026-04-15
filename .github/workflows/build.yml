@@ -82,4 +82,4 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.name }}:latest
+            ghcr.io/nt548_idp/${{ matrix.name }}:latest
