@@ -16,5 +16,5 @@ jobs:
     uses: ./.github/workflows/ci-service.yml
     with:
       service_name: cartservice
-      service_path: ./src/cartservice
+      service_path: ./src/cartservice/src/
     secrets: inherit
