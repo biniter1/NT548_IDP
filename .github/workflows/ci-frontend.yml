@@ -9,6 +9,9 @@ on:
   workflow_dispatch:
 jobs:
   build:
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/ci-service.yml
     with:
       service_name: frontend
