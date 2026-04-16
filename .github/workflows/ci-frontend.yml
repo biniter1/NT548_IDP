@@ -1,0 +1,16 @@
+name: CI Frontend service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/frontend/**'
+      - 'k8s/apps/frontend//**'
+  workflow_dispatch:
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: frontend
+      service_path: src/frontend
+    secrets: inherit 

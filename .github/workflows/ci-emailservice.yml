@@ -1,0 +1,17 @@
+name: CI — emailservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/emailservice/**'
+      - 'apps/emailservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: emailservice
+      service_path: ./src/emailservice
+    secrets: inherit

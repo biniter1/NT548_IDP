@@ -1,0 +1,17 @@
+name: CI — currencyservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/currencyservice/**'
+      - 'apps/currencyservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: currencyservice
+      service_path: ./src/currencyservice
+    secrets: inherit

@@ -1,0 +1,17 @@
+name: CI — paymentservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/paymentservice/**'
+      - 'apps/paymentservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: paymentservice
+      service_path: ./src/paymentservice
+    secrets: inherit

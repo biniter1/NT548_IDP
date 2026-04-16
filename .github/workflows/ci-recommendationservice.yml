@@ -1,0 +1,17 @@
+name: CI — recommendationservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/recommendationservice/**'
+      - 'apps/recommendationservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: recommendationservice
+      service_path: ./src/recommendationservice
+    secrets: inherit

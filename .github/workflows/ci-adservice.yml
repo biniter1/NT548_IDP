@@ -1,0 +1,17 @@
+name: CI — adservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/adservice/**'
+      - 'apps/adservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: adservice
+      service_path: ./src/adservice
+    secrets: inherit

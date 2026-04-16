@@ -1,0 +1,17 @@
+name: CI — checkoutservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/checkoutservice/**'
+      - 'apps/checkoutservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: checkoutservice
+      service_path: ./src/checkoutservice
+    secrets: inherit

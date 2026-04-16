@@ -1,0 +1,17 @@
+name: CI — productcatalogservice
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/productcatalogservice/**'
+      - 'apps/productcatalogservice/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci-service.yml
+    with:
+      service_name: productcatalogservice
+      service_path: ./src/productcatalogservice
+    secrets: inherit
