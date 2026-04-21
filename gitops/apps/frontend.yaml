@@ -14,7 +14,6 @@ spec:
       helm:
         valueFiles:
           - $values/k8s/local/apps/values-override.yaml
-          - $values/k8s/local/apps/frontend/values.yaml
     - repoURL: https://github.com/biniter1/NT548_IDP.git
       targetRevision: main
       ref: values
