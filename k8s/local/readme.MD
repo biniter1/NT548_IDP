@@ -72,7 +72,7 @@ kubectl wait --namespace ingress-nginx \
 kubectl get pods -n ingress-nginx
 ```
 
-5. Tạo các thư mục service và file values
+5. Tạo các thư mục service và file values (chỉ chạy lần đầu tiên khi setup cluster thôi)
 ```bash
 cd scripts
 ./init-service-values.sh

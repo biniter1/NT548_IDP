@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: frontend
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/biniter1/NT548_IDP.git
+      targetRevision: main
+      path: helm-chart
+      helm:
+        valueFiles:
+          - $values/k8s/local/apps/values-override.yaml
+          - $values/k8s/local/apps/currencyservice/values.yaml
+    - repoURL: https://github.com/biniter1/NT548_IDP.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: boutique
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

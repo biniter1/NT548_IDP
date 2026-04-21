@@ -8,3 +8,5 @@ defaultResources:
   limits:
     cpu: 200m
     memory: 128Mi
+imagePullSecrets:
+  - name: ghcr-secret
