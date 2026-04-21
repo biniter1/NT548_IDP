@@ -7,8 +7,6 @@ loadGenerator:
 
 imagePullSecrets:
   - name: ghcr-secret
-frontend:
-  externalService: false
 # Override resources nhỏ lại cho local
 adService:
   resources:
@@ -63,6 +61,7 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
+  externalService: false
 
 paymentService:
   resources:
