@@ -1,0 +1,202 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: online-boutique
+  title: Online Boutique
+  description: Demo e-commerce microservices application
+  tags:
+    - ecommerce
+    - microservices
+spec:
+  owner: devops-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: frontend
+  title: Frontend
+  description: Web UI của Online Boutique
+  tags:
+    - go
+    - web
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=frontend
+    backstage.io/kubernetes-namespace: boutique
+    argocd/app-name: online-boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: cartservice
+  title: Cart Service
+  description: Quản lý giỏ hàng, lưu trong Redis
+  tags:
+    - csharp
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=cartservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkoutservice
+  title: Checkout Service
+  description: Xử lý thanh toán và đặt hàng
+  tags:
+    - go
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=checkoutservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: productcatalogservice
+  title: Product Catalog Service
+  description: Quản lý danh sách sản phẩm
+  tags:
+    - go
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=productcatalogservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: currencyservice
+  title: Currency Service
+  description: Chuyển đổi tiền tệ
+  tags:
+    - nodejs
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=currencyservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: paymentservice
+  title: Payment Service
+  description: Xử lý thanh toán thẻ tín dụng
+  tags:
+    - nodejs
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=paymentservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: emailservice
+  title: Email Service
+  description: Gửi email xác nhận đơn hàng
+  tags:
+    - python
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=emailservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: shippingservice
+  title: Shipping Service
+  description: Tính phí vận chuyển
+  tags:
+    - go
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=shippingservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: recommendationservice
+  title: Recommendation Service
+  description: Gợi ý sản phẩm liên quan
+  tags:
+    - python
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=recommendationservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: adservice
+  title: Ad Service
+  description: Hiển thị quảng cáo liên quan
+  tags:
+    - java
+    - grpc
+  annotations:
+    github.com/project-slug: biniter1/NT548_IDP
+    backstage.io/kubernetes-label-selector: app=adservice
+    backstage.io/kubernetes-namespace: boutique
+spec:
+  type: service
+  lifecycle: production
+  owner: devops-team
+  system: online-boutique

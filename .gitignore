@@ -27,3 +27,9 @@ pkg/
 release/wi-kubernetes-manifests.yaml
 vendor/
 .github/workflows/readme.md
+backstage/
+.yarnrc.yml
+package.json
+yarn.locak
+.yarn
+node_modules/
