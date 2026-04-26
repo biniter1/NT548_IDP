@@ -33,3 +33,4 @@ package.json
 yarn.locak
 .yarn
 node_modules/
+backstage/.env

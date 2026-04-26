@@ -16,7 +16,6 @@ app:
     - page:catalog:
         config:
           path: /
-
 organization:
   name: My Company
 
@@ -32,6 +31,7 @@ backend:
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
+    host: 0.0.0.0
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
@@ -65,17 +65,21 @@ integrations:
     #   token: ${GHE_TOKEN}
 
 proxy:
-  ### Example for how to add a proxy endpoint for the frontend.
-  ### A typical reason to do this is to handle HTTPS and CORS for internal services.
-  # endpoints:
-  #   '/test':
-  #     target: 'https://example.com'
-  #     changeOrigin: true
-
-# Reference documentation http://backstage.io/docs/features/techdocs/configuration
-# Note: After experimenting with basic setup, use CI/CD to generate docs
-# and an external cloud storage when deploying TechDocs for production use-case.
-# https://backstage.io/docs/features/techdocs/how-to-guides#how-to-migrate-from-techdocs-basic-to-recommended-deployment-approach
+  endpoints:
+    '/argocd/api':
+      target: http://localhost:8081/api/v1/
+      changeOrigin: true
+      secure: false
+      headers:
+        Cookie: ${ARGOCD_AUTH_TOKEN}
+argocd:
+  appLocatorMethods:
+    - type: 'config'
+      instances:
+        - name: argocd
+          url: https://localhost:8081
+          token: ${ARGOCD_AUTH_TOKEN}
+          insecure: true
 techdocs:
   builder: 'local' # Alternatives - 'external'
   generator:
@@ -84,22 +88,14 @@ techdocs:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
+  environment: development
   providers:
-    # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
-  # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
-  # to learn more about client id metadata documents
-  experimentalClientIdMetadataDocuments:
-    enabled: false
-    # Optional: restrict which `client_id` URLs are allowed (defaults to ['*'])
-    # allowedClientIdPatterns:
-    #   - 'https://example.com/*'
-    #   - 'https://*.trusted-domain.com/*'
-    # Optional: restrict which redirect URIs are allowed (defaults to ['*'])
-    # allowedRedirectUriPatterns:
-    #   - 'http://localhost:*'
-    #   - 'https://*.example.com/*'
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+    github:
+      development:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -117,6 +113,10 @@ catalog:
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
+    - type: url
+      target: https://github.com/biniter1/NT548_IDP/blob/main/templates/new-service/template.yaml
+      rules:
+        - allow: [Template]
 
     # Thêm dòng này — trỏ vào catalog của project
     - type: url
@@ -125,12 +125,19 @@ catalog:
         - allow: [Component, System]
 
 kubernetes:
-  # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
-
-# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
+  serviceLocatorMethod:
+    type: multiTenant
+  clusterLocatorMethods:
+    - type: config
+      clusters:
+        - name: devops-cluster
+          url: https://127.0.0.1:36226
+          authProvider: serviceAccount
+          skipTLSVerify: true
+          serviceAccountToken: ${K8S_SA_TOKEN}
 permission:
   # setting this to `false` will disable permissions
-  enabled: true
+  enabled: false
 
 # see https://backstage.io/docs/ai/mcp-actions for more details
 mcpActions:

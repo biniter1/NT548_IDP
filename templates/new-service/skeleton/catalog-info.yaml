@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.serviceName }}
+  title: ${{ values.serviceName }}
+  description: ${{ values.description }}
+  tags:
+    - ${{ values.language }}
+  annotations:
+    github.com/project-slug: biniter1/${{ values.serviceName }}
+    backstage.io/kubernetes-id: ${{ values.serviceName }}
+    backstage.io/kubernetes-namespace: boutique
+    argocd/app-name: online-boutique
+spec:
+  type: service
+  lifecycle: development
+  owner: devops-team
+  system: online-boutique
