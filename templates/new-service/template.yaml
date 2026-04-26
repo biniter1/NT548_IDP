@@ -19,10 +19,74 @@ spec:
         - description
       properties:
         serviceName:
-          title: Tên service
+          title: Ten service
           type: string
-          description: Viết thường, không có space. VD: orderservice
-          pattern: '^[a-z][a-z0-9-]*$'
+          description: Viet thuong, khong co space. VD orderservice
+          pattern: '^[a-z][a-z0-9-]*
+        description:
+          title: Mô tả service
+          type: string
+        language:
+          title: Ngôn ngữ
+          type: string
+          enum:
+            - go
+            - python
+            - nodejs
+          default: go
+
+    - title: GitHub Repository
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Chọn GitHub repo
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            allowedOwners:
+              - biniter1
+
+  # Actions Backstage thực hiện
+  steps:
+    - id: fetch-template
+      name: Copy boilerplate files
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          description: ${{ parameters.description }}
+          language: ${{ parameters.language }}
+
+    - id: publish
+      name: Tạo GitHub repository
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        repoVisibility: private
+
+    - id: register
+      name: Đăng ký vào Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  # Link hiển thị sau khi tạo xong
+  output:
+    links:
+      - title: Xem repo trên GitHub
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Xem trong Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+
           ui:autofocus: true
         description:
           title: Mô tả service
