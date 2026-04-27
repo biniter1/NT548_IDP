@@ -22,7 +22,7 @@ spec:
           title: Ten service
           type: string
           description: Viet thuong, khong co space. VD orderservice
-          pattern: '^[a-z][a-z0-9-]*
+          pattern: "^[a-z][a-z0-9-]*$"
         description:
           title: Mô tả service
           type: string
