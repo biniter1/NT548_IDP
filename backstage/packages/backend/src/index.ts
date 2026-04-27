@@ -45,4 +45,5 @@ backend.add(import('@backstage/plugin-mcp-actions-backend'));
 // argocd plugin
 backend.add(import('@roadiehq/backstage-plugin-argo-cd-backend'));
 backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
+backend.add(import('@internal/backstage-plugin-aiops-backend'));
 backend.start();

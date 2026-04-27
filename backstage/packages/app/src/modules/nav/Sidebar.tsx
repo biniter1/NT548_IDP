@@ -14,15 +14,21 @@ import { SidebarSearchModal } from '@backstage/plugin-search';
 import { UserSettingsSignInAvatar } from '@backstage/plugin-user-settings';
 import { NotificationsSidebarItem } from '@backstage/plugin-notifications';
 
+function NavItem({ item }: { item: any }) {
+  return (
+    <SidebarItem icon={() => item.icon} to={item.href} text={item.title} />
+  );
+}
+
 export const SidebarContent = NavContentBlueprint.make({
   params: {
     component: ({ navItems }) => {
-      const nav = navItems.withComponent(item => (
-        <SidebarItem icon={() => item.icon} to={item.href} text={item.title} />
-      ));
-
-      // Skipped items
-      nav.take('page:search'); // Using search modal instead
+      navItems.take('page:search'); // skip - using search modal instead
+      const catalogItem = navItems.take('page:catalog');
+      const scaffolderItem = navItems.take('page:scaffolder');
+      const appVisualizerItem = navItems.take('page:app-visualizer');
+      const userSettingsItem = navItems.take('page:user-settings');
+      const restItems = navItems.rest().slice().sort((a: any, b: any) => a.title.localeCompare(b.title));
 
       return (
         <Sidebar>
@@ -32,11 +38,13 @@ export const SidebarContent = NavContentBlueprint.make({
           </SidebarGroup>
           <SidebarDivider />
           <SidebarGroup label="Menu" icon={<MenuIcon />}>
-            {nav.take('page:catalog')}
-            {nav.take('page:scaffolder')}
+            {catalogItem && <NavItem key={catalogItem.node.spec.id} item={catalogItem} />}
+            {scaffolderItem && <NavItem key={scaffolderItem.node.spec.id} item={scaffolderItem} />}
             <SidebarDivider />
             <SidebarScrollWrapper>
-              {nav.rest({ sortBy: 'title' })}
+              {restItems.map((item: any) => (
+                <NavItem key={item.node.spec.id} item={item} />
+              ))}
             </SidebarScrollWrapper>
           </SidebarGroup>
           <SidebarSpace />
@@ -48,8 +56,8 @@ export const SidebarContent = NavContentBlueprint.make({
             icon={<UserSettingsSignInAvatar />}
             to="/settings"
           >
-            {nav.take('page:app-visualizer')}
-            {nav.take('page:user-settings')}
+            {appVisualizerItem && <NavItem key={appVisualizerItem.node.spec.id} item={appVisualizerItem} />}
+            {userSettingsItem && <NavItem key={userSettingsItem.node.spec.id} item={userSettingsItem} />}
           </SidebarGroup>
         </Sidebar>
       );

@@ -2,7 +2,13 @@ import { createApp } from '@backstage/frontend-defaults';
 import catalogPlugin from '@backstage/plugin-catalog/alpha';
 import { navModule } from './modules/nav';
 import githubActionsPlugin from '@backstage-community/plugin-github-actions/alpha';
+import { aiopsPlugin } from '@internal/backstage-plugin-aiops/extensions';
 
 export default createApp({
-  features: [catalogPlugin, githubActionsPlugin, navModule],
+  features: [
+    catalogPlugin,
+    githubActionsPlugin,
+    aiopsPlugin,
+    navModule,
+  ],
 });

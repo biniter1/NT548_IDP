@@ -99,7 +99,11 @@ auth:
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
-
+aiops:
+  lokiUrl: http://localhost:3100
+  prometheusUrl: http://localhost:9090
+  openaiApiKey: ${OPENAI_API_KEY}
+  model: gpt-4o-mini
 catalog:
   locations:
     # Giữ nguyên các location mặc định bên dưới
