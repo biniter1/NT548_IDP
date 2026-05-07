@@ -1,0 +1,75 @@
+# Namespace cho service mới
+# Mỗi service có namespace riêng để isolate
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hahahah
+  labels:
+    app.kubernetes.io/managed-by: backstage
+    owner: devops-team
+    backstage.io/kubernetes-id: hahahah
+---
+# ResourceQuota — giới hạn tài nguyên để tránh 1 service ăn hết cluster
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: hahahah-quota
+  namespace: hahahah
+spec:
+  hard:
+    requests.cpu: "200m"
+    requests.memory: "256Mi"
+    limits.cpu: "200m"
+    limits.memory: "256Mi"
+    pods: "10"
+---
+# ServiceAccount cho service — least privilege
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hahahah
+  namespace: hahahah
+  labels:
+    app: hahahah
+---
+# Role — chỉ cho phép đọc configmap và secret của chính mình
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: hahahah-role
+  namespace: hahahah
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+# RoleBinding — gắn role với serviceaccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hahahah-rolebinding
+  namespace: hahahah
+subjects:
+  - kind: ServiceAccount
+    name: hahahah
+    namespace: hahahah
+roleRef:
+  kind: Role
+  name: hahahah-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# LimitRange — default limits cho pods không set limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: hahahah-limits
+  namespace: hahahah
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "200m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
