@@ -88,7 +88,7 @@ spec:
       name: "📁 Copy boilerplate files"
       action: fetch:template
       input:
-        url: ./skeleton
+        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/skeleton
         values:
           serviceName: ${{ parameters.serviceName }}
           description: ${{ parameters.description }}
@@ -120,7 +120,7 @@ spec:
       name: "☸️ Generate namespace manifest"
       action: fetch:template
       input:
-        url: ./k8s-templates/namespace.yaml
+        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/k8s-templates
         targetPath: ./k8s-output
         values:
           serviceName: ${{ parameters.serviceName }}
