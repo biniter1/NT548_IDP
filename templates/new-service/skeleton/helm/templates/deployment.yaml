@@ -1,42 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${{ values.serviceName }}
-  namespace: ${{ values.serviceName }}
+  name: {{ .Release.Name }}
   labels:
-    app: ${{ values.serviceName }}
+    app: {{ .Release.Name }}
 spec:
-  replicas: {{ "{{" }} .Values.replicaCount {{ "}}" }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: ${{ values.serviceName }}
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: ${{ values.serviceName }}
-        app.kubernetes.io/name: ${{ values.serviceName }}
+        app: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ .Release.Name }}
     spec:
       containers:
-        - name: ${{ values.serviceName }}
-          image: "{{ "{{" }} .Values.image.repository {{ "}}" }}:{{ "{{" }} .Values.image.tag {{ "}}" }}"
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
-            - containerPort: ${{ values.port }}
+            - containerPort: {{ .Values.service.port }}
           resources:
             requests:
-              cpu: {{ "{{" }} .Values.resources.requests.cpu {{ "}}" }}
-              memory: {{ "{{" }} .Values.resources.requests.memory {{ "}}" }}
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
             limits:
-              cpu: {{ "{{" }} .Values.resources.limits.cpu {{ "}}" }}
-              memory: {{ "{{" }} .Values.resources.limits.memory {{ "}}" }}
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${{ values.serviceName }}
-  namespace: ${{ values.serviceName }}
+  name: {{ .Release.Name }}
 spec:
   selector:
-    app: ${{ values.serviceName }}
+    app: {{ .Release.Name }}
   ports:
-    - port: ${{ values.port }}
-      targetPort: ${{ values.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
