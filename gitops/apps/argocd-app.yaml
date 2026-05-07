@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test1234
+  name: test123455
   namespace: argocd
   labels:
     app.kubernetes.io/managed-by: backstage
@@ -9,17 +9,17 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    backstage.io/managed-by-location: "url:https://github.com/biniter1/test1234"
+    backstage.io/managed-by-location: "url:https://github.com/biniter1/test123455"
 spec:
   project: default
   source:
-    repoURL: https://github.com/biniter1/test1234.git
+    repoURL: https://github.com/biniter1/test123455.git
     targetRevision: main
     path: helm
     helm:
       values: |
         image:
-          repository: ghcr.io/biniter1/test1234
+          repository: ghcr.io/biniter1/test123455
           tag: latest
         service:
           port: 8080
@@ -33,7 +33,7 @@ spec:
         replicaCount: 1
   destination:
     server: https://kubernetes.default.svc
-    namespace: test1234
+    namespace: test123455
   syncPolicy:
     automated:
       prune: true
