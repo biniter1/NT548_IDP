@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: new-microservice
   title: New Microservice
-  description: Create a new microservice — repo, CI, namespace, ArgoCD, monitoring all in one click
+  description: Create a new microservice — repo, CI, K8s namespace, ArgoCD, all in one click
   tags:
     - recommended
     - microservice
@@ -13,7 +13,6 @@ spec:
   type: service
 
   parameters:
-    # ── Step 1: Service info ──────────────────
     - title: Service Information
       required:
         - serviceName
@@ -23,7 +22,7 @@ spec:
         serviceName:
           title: Service Name
           type: string
-          description: Lowercase only, no spaces. Example orderservice
+          description: Lowercase only, no spaces (e.g. orderservice)
           pattern: "^[a-z][a-z0-9-]*$"
           ui:autofocus: true
         description:
@@ -43,7 +42,6 @@ spec:
           type: number
           default: 8080
 
-    # ── Step 2: Resource limits ───────────────
     - title: Resource Configuration
       properties:
         cpuRequest:
@@ -67,7 +65,6 @@ spec:
           type: number
           default: 1
 
-    # ── Step 3: Repository ────────────────────
     - title: GitHub Repository
       required:
         - repoUrl
@@ -83,7 +80,7 @@ spec:
               - biniter1
 
   steps:
-    # ── Step 1: Copy boilerplate ──────────────
+    # ── Step 1: Render skeleton → workspace ──
     - id: fetch-template
       name: "📁 Copy boilerplate files"
       action: fetch:template
@@ -101,7 +98,7 @@ spec:
           memoryLimit: ${{ parameters.memoryLimit }}
           replicas: ${{ parameters.replicas }}
 
-    # ── Step 2: Tạo GitHub repo ───────────────
+    # ── Step 2: Push workspace → GitHub repo ─
     - id: publish
       name: "🐙 Create GitHub repository"
       action: publish:github
@@ -109,38 +106,13 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
-        repoVisibility: private
+        repoVisibility: public
         topics:
           - microservice
           - online-boutique
           - ${{ parameters.language }}
 
-    # ── Step 3: Tạo namespace manifest ───────
-    - id: create-namespace-manifest
-      name: "☸️ Generate namespace manifest"
-      action: fetch:template
-      input:
-        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/k8s-templates/
-        targetPath: ./k8s-output
-        values:
-          serviceName: ${{ parameters.serviceName }}
-          owner: ${{ parameters.owner }}
-          cpuLimit: ${{ parameters.cpuLimit }}
-          memoryLimit: ${{ parameters.memoryLimit }}
-
-    # ── Step 4: Apply namespace lên K8s ──────
-    - id: apply-namespace
-      name: "☸️ Create K8s namespace & RBAC"
-      action: publish:github:pull-request
-      input:
-        repoUrl: "github.com?repo=NT548_IDP&owner=biniter1"
-        title: "feat: add namespace for ${{ parameters.serviceName }}"
-        branchName: "feat/namespace-${{ parameters.serviceName }}"
-        description: "Auto-generated namespace and RBAC for new service"
-        sourcePath: ./k8s-output
-        targetPath: k8s/namespaces/${{ parameters.serviceName }}
-
-    # ── Step 4.5: Tạo ArgoCD manifest ────────
+    # ── Step 3: Render ArgoCD Application manifest ──
     - id: create-argocd-manifest
       name: "🔄 Generate ArgoCD manifest"
       action: fetch:template
@@ -157,19 +129,24 @@ spec:
           memoryLimit: ${{ parameters.memoryLimit }}
           replicas: ${{ parameters.replicas }}
 
-    # ── Step 5: Tạo ArgoCD Application ───────
+    # ── Step 4: PR ArgoCD Application → gitops repo ──
     - id: create-argocd-app
-      name: "🔄 Create ArgoCD Application"
+      name: "🔄 Create ArgoCD Application PR"
       action: publish:github:pull-request
       input:
         repoUrl: "github.com?repo=NT548_IDP&owner=biniter1"
         title: "feat: add ArgoCD app for ${{ parameters.serviceName }}"
         branchName: "feat/argocd-${{ parameters.serviceName }}"
-        description: "Auto-generated ArgoCD Application for ${{ parameters.serviceName }}"
+        description: |
+          Auto-generated ArgoCD Application for **${{ parameters.serviceName }}**.
+
+          - Source repo: `https://github.com/biniter1/${{ parameters.serviceName }}`
+          - Target namespace: `${{ parameters.serviceName }}`
+          - Helm chart path: `helm/`
         sourcePath: ./argocd-output
         targetPath: gitops/apps
 
-    # ── Step 6: Đăng ký catalog ──────────────
+    # ── Step 5: Register in Backstage catalog ──
     - id: register
       name: "📋 Register in Software Catalog"
       action: catalog:register
@@ -185,19 +162,20 @@ spec:
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
     text:
-      - title: "✅ Next steps"
+      - title: "✅ Service created — next steps"
         content: |
-          Your service **${{ parameters.serviceName }}** has been created!
-          
-          **What was done automatically:**
-          - GitHub repo created with boilerplate code
-          - CI/CD pipeline configured
-          - K8s namespace PR opened (review and merge)
-          - ArgoCD Application PR opened (review and merge)
-          - Registered in Software Catalog
-          
-          **What you need to do:**
-          1. Clone the repo and start coding
-          2. Merge the namespace PR
-          3. Merge the ArgoCD PR
-          4. Push code → CI runs → ArgoCD deploys automatically
+          **${{ parameters.serviceName }}** is ready!
+
+          **Done automatically:**
+          - GitHub repo with boilerplate, Dockerfile, Helm chart, and CI pipeline
+          - K8s namespace manifest at `k8s/namespace.yaml` in the repo
+          - ArgoCD Application PR opened → review and merge
+
+          **Required manual steps:**
+          1. Add these GitHub Secrets to the new repo:
+             - `KUBECONFIG_B64` — base64 kubeconfig: `cat ~/.kube/config | base64`
+             - `ARGOCD_TOKEN` — ArgoCD API token (optional, for auto-registration)
+             - `ARGOCD_SERVER` — ArgoCD URL, e.g. `https://argocd.example.com`
+          2. Run **Actions → Setup** workflow to create the K8s namespace
+          3. Merge the ArgoCD Application PR in NT548_IDP
+          4. Push code → CI builds Docker image → ArgoCD deploys automatically

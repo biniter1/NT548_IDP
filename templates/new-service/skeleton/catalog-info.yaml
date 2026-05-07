@@ -9,10 +9,10 @@ metadata:
   annotations:
     github.com/project-slug: biniter1/${{ values.serviceName }}
     backstage.io/kubernetes-id: ${{ values.serviceName }}
-    backstage.io/kubernetes-namespace: boutique
-    argocd/app-name: online-boutique
+    backstage.io/kubernetes-namespace: ${{ values.serviceName }}
+    argocd/app-name: ${{ values.serviceName }}
 spec:
   type: service
   lifecycle: development
-  owner: devops-team
+  owner: ${{ values.owner }}
   system: online-boutique

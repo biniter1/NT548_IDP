@@ -1,0 +1,59 @@
+name: Setup - ${{ values.serviceName }}
+
+# Runs once when the repo is first created to bootstrap K8s resources.
+# Trigger manually via Actions tab, or it auto-runs when k8s/namespace.yaml is pushed.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'k8s/namespace.yaml'
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo {% raw %}"${{ secrets.KUBECONFIG_B64 }}"{% endraw %} | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Create K8s namespace & RBAC
+        run: kubectl apply -f k8s/namespace.yaml
+
+      # Optional: register private repo with ArgoCD so it can pull the Helm chart.
+      # Skip if repo is public or ArgoCD already has a credential template for github.com/biniter1/*.
+      - name: Register repo with ArgoCD
+        env:
+          ARGOCD_TOKEN: {% raw %}${{ secrets.ARGOCD_TOKEN }}{% endraw %}
+          ARGOCD_SERVER: {% raw %}${{ secrets.ARGOCD_SERVER }}{% endraw %}
+          GH_PAT: {% raw %}${{ secrets.GH_PAT }}{% endraw %}
+        run: |
+          if [ -z "$ARGOCD_TOKEN" ] || [ -z "$ARGOCD_SERVER" ]; then
+            echo "ARGOCD_TOKEN or ARGOCD_SERVER not set — skipping repo registration"
+            exit 0
+          fi
+          curl -sk -X POST \
+            -H "Authorization: Bearer $ARGOCD_TOKEN" \
+            -H "Content-Type: application/json" \
+            "$ARGOCD_SERVER/api/v1/repositories" \
+            -d "{
+              \"repo\": \"https://github.com/biniter1/${{ values.serviceName }}.git\",
+              \"username\": \"x-access-token\",
+              \"password\": \"$GH_PAT\",
+              \"type\": \"git\",
+              \"insecure\": true
+            }" \
+            && echo "Repo registered with ArgoCD" \
+            || echo "Registration failed (repo may already exist)"
