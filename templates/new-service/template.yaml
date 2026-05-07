@@ -120,7 +120,7 @@ spec:
       name: "☸️ Generate namespace manifest"
       action: fetch:template
       input:
-        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/k8s-templates
+        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/k8s-templates/
         targetPath: ./k8s-output
         values:
           serviceName: ${{ parameters.serviceName }}
