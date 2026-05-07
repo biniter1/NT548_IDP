@@ -1,0 +1,75 @@
+# Namespace cho service mới
+# Mỗi service có namespace riêng để isolate
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${{ values.serviceName }}
+  labels:
+    app.kubernetes.io/managed-by: backstage
+    owner: ${{ values.owner }}
+    backstage.io/kubernetes-id: ${{ values.serviceName }}
+---
+# ResourceQuota — giới hạn tài nguyên để tránh 1 service ăn hết cluster
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ${{ values.serviceName }}-quota
+  namespace: ${{ values.serviceName }}
+spec:
+  hard:
+    requests.cpu: "${{ values.cpuLimit }}"
+    requests.memory: "${{ values.memoryLimit }}"
+    limits.cpu: "${{ values.cpuLimit }}"
+    limits.memory: "${{ values.memoryLimit }}"
+    pods: "10"
+---
+# ServiceAccount cho service — least privilege
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${{ values.serviceName }}
+  namespace: ${{ values.serviceName }}
+  labels:
+    app: ${{ values.serviceName }}
+---
+# Role — chỉ cho phép đọc configmap và secret của chính mình
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ${{ values.serviceName }}-role
+  namespace: ${{ values.serviceName }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+# RoleBinding — gắn role với serviceaccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ${{ values.serviceName }}-rolebinding
+  namespace: ${{ values.serviceName }}
+subjects:
+  - kind: ServiceAccount
+    name: ${{ values.serviceName }}
+    namespace: ${{ values.serviceName }}
+roleRef:
+  kind: Role
+  name: ${{ values.serviceName }}-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# LimitRange — default limits cho pods không set limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ${{ values.serviceName }}-limits
+  namespace: ${{ values.serviceName }}
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "200m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"

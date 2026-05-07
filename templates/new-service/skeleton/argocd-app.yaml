@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${{ values.serviceName }}
+  namespace: argocd
+  labels:
+    app.kubernetes.io/managed-by: backstage
+    owner: ${{ values.owner }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    backstage.io/managed-by-location: "url:https://github.com/biniter1/${{ values.serviceName }}"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/biniter1/${{ values.serviceName }}.git
+    targetRevision: main
+    path: helm
+    helm:
+      values: |
+        image:
+          repository: ghcr.io/biniter1/${{ values.serviceName }}
+          tag: latest
+        service:
+          port: ${{ values.port }}
+        resources:
+          requests:
+            cpu: ${{ values.cpuRequest }}
+            memory: ${{ values.memoryRequest }}
+          limits:
+            cpu: ${{ values.cpuLimit }}
+            memory: ${{ values.memoryLimit }}
+        replicaCount: ${{ values.replicas }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ${{ values.serviceName }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false

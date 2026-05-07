@@ -3,19 +3,22 @@ kind: Template
 metadata:
   name: new-microservice
   title: New Microservice
-  description: Create a new microservice with CI/CD and catalog already setup
+  description: Create a new microservice — repo, CI, namespace, ArgoCD, monitoring all in one click
   tags:
     - recommended
     - microservice
+    - golden-path
 spec:
   owner: devops-team
   type: service
 
   parameters:
+    # ── Step 1: Service info ──────────────────
     - title: Service Information
       required:
         - serviceName
         - description
+        - owner
       properties:
         serviceName:
           title: Service Name
@@ -26,15 +29,45 @@ spec:
         description:
           title: Description
           type: string
+        owner:
+          title: Team Owner
+          type: string
+          default: devops-team
         language:
           title: Language
           type: string
-          enum:
-            - go
-            - python
-            - nodejs
+          enum: [go, python, nodejs]
           default: go
+        port:
+          title: Service Port
+          type: number
+          default: 8080
 
+    # ── Step 2: Resource limits ───────────────
+    - title: Resource Configuration
+      properties:
+        cpuRequest:
+          title: CPU Request
+          type: string
+          default: "100m"
+        memoryRequest:
+          title: Memory Request
+          type: string
+          default: "128Mi"
+        cpuLimit:
+          title: CPU Limit
+          type: string
+          default: "200m"
+        memoryLimit:
+          title: Memory Limit
+          type: string
+          default: "256Mi"
+        replicas:
+          title: Initial Replicas
+          type: number
+          default: 1
+
+    # ── Step 3: Repository ────────────────────
     - title: GitHub Repository
       required:
         - repoUrl
@@ -50,27 +83,78 @@ spec:
               - biniter1
 
   steps:
+    # ── Step 1: Copy boilerplate ──────────────
     - id: fetch-template
-      name: Copy boilerplate files
+      name: "📁 Copy boilerplate files"
       action: fetch:template
       input:
         url: ./skeleton
         values:
           serviceName: ${{ parameters.serviceName }}
           description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
           language: ${{ parameters.language }}
+          port: ${{ parameters.port }}
+          cpuRequest: ${{ parameters.cpuRequest }}
+          memoryRequest: ${{ parameters.memoryRequest }}
+          cpuLimit: ${{ parameters.cpuLimit }}
+          memoryLimit: ${{ parameters.memoryLimit }}
+          replicas: ${{ parameters.replicas }}
 
+    # ── Step 2: Tạo GitHub repo ───────────────
     - id: publish
-      name: Create GitHub repository
+      name: "🐙 Create GitHub repository"
       action: publish:github
       input:
         description: ${{ parameters.description }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
         repoVisibility: private
+        topics:
+          - microservice
+          - online-boutique
+          - ${{ parameters.language }}
 
+    # ── Step 3: Tạo namespace manifest ───────
+    - id: create-namespace-manifest
+      name: "☸️ Generate namespace manifest"
+      action: fetch:template
+      input:
+        url: ./k8s-templates/namespace.yaml
+        targetPath: ./k8s-output
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          owner: ${{ parameters.owner }}
+          cpuLimit: ${{ parameters.cpuLimit }}
+          memoryLimit: ${{ parameters.memoryLimit }}
+
+    # ── Step 4: Apply namespace lên K8s ──────
+    - id: apply-namespace
+      name: "☸️ Create K8s namespace & RBAC"
+      action: publish:github:pull-request
+      input:
+        repoUrl: "github.com?repo=NT548_IDP&owner=biniter1"
+        title: "feat: add namespace for ${{ parameters.serviceName }}"
+        branchName: "feat/namespace-${{ parameters.serviceName }}"
+        description: "Auto-generated namespace and RBAC for new service"
+        sourcePath: ./k8s-output
+        targetPath: k8s/namespaces/${{ parameters.serviceName }}
+
+    # ── Step 5: Tạo ArgoCD Application ───────
+    - id: create-argocd-app
+      name: "🔄 Create ArgoCD Application"
+      action: publish:github:pull-request
+      input:
+        repoUrl: "github.com?repo=NT548_IDP&owner=biniter1"
+        title: "feat: add ArgoCD app for ${{ parameters.serviceName }}"
+        branchName: "feat/argocd-${{ parameters.serviceName }}"
+        description: "Auto-generated ArgoCD Application for ${{ parameters.serviceName }}"
+        sourcePath: ./argocd-output
+        targetPath: gitops/apps
+
+    # ── Step 6: Đăng ký catalog ──────────────
     - id: register
-      name: Register in Catalog
+      name: "📋 Register in Software Catalog"
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
@@ -78,8 +162,25 @@ spec:
 
   output:
     links:
-      - title: View on GitHub
+      - title: "🐙 GitHub Repository"
         url: ${{ steps['publish'].output.remoteUrl }}
-      - title: View in Catalog
+      - title: "📋 View in Catalog"
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
+    text:
+      - title: "✅ Next steps"
+        content: |
+          Your service **${{ parameters.serviceName }}** has been created!
+          
+          **What was done automatically:**
+          - GitHub repo created with boilerplate code
+          - CI/CD pipeline configured
+          - K8s namespace PR opened (review and merge)
+          - ArgoCD Application PR opened (review and merge)
+          - Registered in Software Catalog
+          
+          **What you need to do:**
+          1. Clone the repo and start coding
+          2. Merge the namespace PR
+          3. Merge the ArgoCD PR
+          4. Push code → CI runs → ArgoCD deploys automatically
