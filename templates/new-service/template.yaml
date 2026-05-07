@@ -140,6 +140,23 @@ spec:
         sourcePath: ./k8s-output
         targetPath: k8s/namespaces/${{ parameters.serviceName }}
 
+    # ── Step 4.5: Tạo ArgoCD manifest ────────
+    - id: create-argocd-manifest
+      name: "🔄 Generate ArgoCD manifest"
+      action: fetch:template
+      input:
+        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/argocd-templates/
+        targetPath: ./argocd-output
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          owner: ${{ parameters.owner }}
+          port: ${{ parameters.port }}
+          cpuRequest: ${{ parameters.cpuRequest }}
+          memoryRequest: ${{ parameters.memoryRequest }}
+          cpuLimit: ${{ parameters.cpuLimit }}
+          memoryLimit: ${{ parameters.memoryLimit }}
+          replicas: ${{ parameters.replicas }}
+
     # ── Step 5: Tạo ArgoCD Application ───────
     - id: create-argocd-app
       name: "🔄 Create ArgoCD Application"
