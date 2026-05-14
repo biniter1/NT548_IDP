@@ -97,7 +97,12 @@ spec:
           cpuLimit: ${{ parameters.cpuLimit }}
           memoryLimit: ${{ parameters.memoryLimit }}
           replicas: ${{ parameters.replicas }}
-
+    - id: fetch-helm
+      name: "⎈ Copy Helm chart"
+      action: fetch:plain
+      input:
+        url: https://github.com/biniter1/NT548_IDP/tree/main/templates/new-service/helm-chart
+        targetPath: ./helm
     # ── Step 2: Push workspace → GitHub repo ─
     - id: publish
       name: "🐙 Create GitHub repository"
