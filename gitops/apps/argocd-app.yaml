@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hhhhhhhh
+  name: hiaz
   namespace: argocd
   labels:
     app.kubernetes.io/managed-by: backstage
@@ -9,17 +9,17 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    backstage.io/managed-by-location: "url:https://github.com/biniter1/hhhhhhhh"
+    backstage.io/managed-by-location: "url:https://github.com/biniter1/hiaz"
 spec:
   project: default
   source:
-    repoURL: https://github.com/biniter1/hhhhhhhh.git
+    repoURL: https://github.com/biniter1/hiaz.git
     targetRevision: main
     path: helm
     helm:
       values: |
         image:
-          repository: ghcr.io/biniter1/hhhhhhhh
+          repository: ghcr.io/biniter1/hiaz
           tag: latest
         service:
           port: 8080
@@ -33,7 +33,7 @@ spec:
         replicaCount: 1
   destination:
     server: https://kubernetes.default.svc
-    namespace: hhhhhhhh
+    namespace: hiaz
   syncPolicy:
     automated:
       prune: true
