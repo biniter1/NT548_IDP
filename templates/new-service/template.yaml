@@ -65,20 +65,6 @@ spec:
           type: number
           default: 1
 
-    - title: GitHub Repository
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
-          type: string
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - github.com
-            allowedOwners:
-              - biniter1
-
   steps:
     # ── Step 1: Render skeleton → workspace ──
     - id: fetch-template
@@ -108,14 +94,10 @@ spec:
       name: "🐙 Create GitHub repository"
       action: publish:github
       input:
+        repoUrl: "github.com?repo=${{ parameters.serviceName }}&owner=biniter1"
         description: ${{ parameters.description }}
-        repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
-        repoVisibility: public
-        topics:
-          - microservice
-          - online-boutique
-          - ${{ parameters.language }}
+        repoVisibility: private
 
     # ── Step 3: Render ArgoCD Application manifest ──
     - id: create-argocd-manifest
