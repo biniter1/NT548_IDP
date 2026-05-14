@@ -19,7 +19,7 @@ spec:
     helm:
       values: |
         image:
-          repository: ghcr.io/biniter1/finaltest
+          repository: ghcr.io/biniter1/frontend
           tag: latest
         service:
           port: 8080
