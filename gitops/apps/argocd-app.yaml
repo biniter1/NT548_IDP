@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hiaz
+  name: goldentest
   namespace: argocd
   labels:
     app.kubernetes.io/managed-by: backstage
@@ -9,17 +9,17 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    backstage.io/managed-by-location: "url:https://github.com/biniter1/hiaz"
+    backstage.io/managed-by-location: "url:https://github.com/biniter1/goldentest"
 spec:
   project: default
   source:
-    repoURL: https://github.com/biniter1/hiaz.git
+    repoURL: https://github.com/biniter1/goldentest.git
     targetRevision: main
     path: helm
     helm:
       values: |
         image:
-          repository: ghcr.io/biniter1/hiaz
+          repository: ghcr.io/biniter1/goldentest
           tag: latest
         service:
           port: 8080
@@ -33,7 +33,7 @@ spec:
         replicaCount: 1
   destination:
     server: https://kubernetes.default.svc
-    namespace: hiaz
+    namespace: goldentest
   syncPolicy:
     automated:
       prune: true
